@@ -31,7 +31,7 @@ export default async function handler(
     return data;
   };
 
-  const chunkArray = (array: string, size: number) => {
+  const chunkArray = (array: any[], size: number) => {
     const chunks = [];
     for (let i = 0; i < array.length; i += size) {
       chunks.push(array.slice(i, i + size));
@@ -53,7 +53,7 @@ export default async function handler(
     const data = await fetchJsonFromGist(gistUrl);
     await processAndSaveData(data);
     res.status(200).json({ message: "Cards loaded successfully" });
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({ message: "Error loading cards", error: error.message });
   }
 }
