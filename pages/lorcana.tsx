@@ -58,11 +58,8 @@ export default function Lorcana() {
   );
 }
 
-type HitProps = {
-  hit: Hit;
-};
 
-function Hit({ hit }: HitProps) {
+function Hit({ hit }: any) {
   return (
     <article>
       <img src={hit.image} alt={hit.name}/>

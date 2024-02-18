@@ -5,7 +5,7 @@ const es = require('event-stream');
 const readStream = fs.createReadStream('cards-raw.json');
 const writeStream = fs.createWriteStream('lorcana.json');
 
-const transformStream = es.mapSync((data) => {
+const transformStream = es.mapSync((data: any) => {
   const transformedData = {
     id: data.id,
     name: data.name,
