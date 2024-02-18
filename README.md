@@ -2,8 +2,7 @@
 
 ![alt text](documentation/image.png)
 
-## Its Live!
-Check it out [here](https://algolia-assessment-mxev608yz-casej.vercel.app/)
+## Check it out [here](https://algolia-assessment.vercel.app/)!
 
 ## Getting Started Locally
 1. `git clone https://github.com/Case104/algolia-assessment.git`

@@ -13,7 +13,8 @@ import {
 const future = { preserveSharedStateOnUnmount: true };
 
 export default function Lorcana() {
-  const { setApiKey, setAppId, loadCards, client, appId, apiKey } = useAlgolia();
+  const { setApiKey, setAppId, loadCards, client, appId, apiKey } =
+    useAlgolia();
 
   return (
     <main className="flex h-screen w-full justify-center">
