@@ -39,7 +39,7 @@ export default async function handler(
     const indices = list.items;
 
     const rulesPromises = indices.map(async (index) => {
-      const rules = await client.initIndex(index.name).searchRules();
+      const rules = await (client.initIndex(index.name).searchRules as any)();
       return { ...index, rules: rules.hits };
     });
 
