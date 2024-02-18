@@ -1,4 +1,5 @@
 import { useAlgolia } from "@/hooks/useAlgolia";
+import { LabeledInput } from "@/components/LabeledInput";
 import Link from "next/link";
 import {
   Configure,
@@ -6,13 +7,13 @@ import {
   Hits,
   InstantSearch,
   Pagination,
-  SearchBox
+  SearchBox,
 } from "react-instantsearch";
 
 const future = { preserveSharedStateOnUnmount: true };
 
 export default function Lorcana() {
-  const { loadCards, client } = useAlgolia();
+  const { setApiKey, setAppId, loadCards, client, appId, apiKey } = useAlgolia();
 
   return (
     <main className="flex h-screen w-full justify-center">
@@ -28,8 +29,23 @@ export default function Lorcana() {
           <button
             className="bg-purple-500 font-bold rounded-full py-2 px-4 my-4 mx-2"
             onClick={loadCards}
-            >Load Cards
+          >
+            Load Cards
           </button>
+        </div>
+        <div className="w-full max-w-xs mb-5">
+          <LabeledInput
+            id="algoliaAppId"
+            label="Algolia App ID"
+            value={appId}
+            onChange={(e) => setAppId(e.target.value)}
+          />
+          <LabeledInput
+            id="algoliaApiKey"
+            label="Algolia API Key"
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
+          />
         </div>
         <div className="w-full">
           <InstantSearch
@@ -41,10 +57,7 @@ export default function Lorcana() {
             <div className="flex">
               <div className="flex-1"></div>
               <div className="flex-3">
-                <SearchBox
-                  placeholder=""
-                  className="mb-2 text-black"
-                />
+                <SearchBox placeholder="" className="mb-2 text-black" />
                 <Hits hitComponent={Hit} />
                 <div className="mx-auto my-8 text-center">
                   <Pagination />
@@ -58,11 +71,10 @@ export default function Lorcana() {
   );
 }
 
-
 function Hit({ hit }: any) {
   return (
     <article>
-      <img src={hit.image} alt={hit.name}/>
+      <img src={hit.image} alt={hit.name} />
       <div>
         <h1>
           <Highlight attribute="name" hit={hit} />
