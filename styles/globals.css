@@ -31,3 +31,12 @@ body {
     text-wrap: balance;
   }
 }
+
+.ais-Hits-item article {
+  display: flex;
+}
+
+.ais-Hits-item img {
+  max-height: 125px;
+  padding-right: 16px;
+}
