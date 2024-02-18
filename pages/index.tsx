@@ -2,9 +2,11 @@ import { LabeledInput } from "@/components/LabeledInput";
 import { NotSignedIn } from "@/components/NotSignedIn";
 import { IndexTable } from "@/components/IndexTable";
 import { RuleRow } from "@/components/RuleRow";
+import { Modal } from "@/components/Modal";
 import { useAlgolia } from "@/hooks/useAlgolia";
 import { signOut, useSession } from "next-auth/react";
 import React from "react";
+import Link from "next/link";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -22,18 +24,22 @@ export default function Home() {
     setAppId,
     setApiKey,
     loadIndices,
-    copyRule
+    copyRule,
+    deleteRule,
   } = useAlgolia();
 
-  const handleCopyButtonClick = (name: string, objectID: string) => {
+  function handleCopyRule() {
+    const { sourceIndex, targetIndex, objectID } = modalState;
     setModalState({
-      status: "open",
-      sourceIndex: name,
-      targetIndex: "",
-      objectID
+      ...modalState,
+      status: "closed"
     });
-  }
+    copyRule({ sourceIndex, targetIndex, objectID });
+    }
 
+  function handleDeleteRule(name: string, objectID: string) {
+    deleteRule(name, objectID);
+  }
 
   if (!session) return <NotSignedIn />;
 
@@ -44,11 +50,18 @@ export default function Home() {
         {session && session.user && (
           <p className="text-xl">Current User: {session.user.email}</p>
         )}
-        <button
-          className="bg-red-500 font-bold rounded-full py-2 px-4 my-4"
-          onClick={() => signOut()}
-        >Log out
-        </button>
+        <div>
+          <button
+            className="bg-red-500 font-bold rounded-full py-2 px-4 my-4"
+            onClick={() => signOut()}
+          >Log out
+          </button>
+          <Link href="/lorcana">
+            <button className="bg-purple-500 font-bold rounded-full py-2 px-4 my-4 mx-2">
+              Lorcana
+            </button>
+          </Link>
+        </div>
         <div className="w-full max-w-xs">
           <LabeledInput
             id="algoliaAppId"
@@ -69,26 +82,40 @@ export default function Home() {
         >Load Indices
         </button>
         {indices.length > 0 ? (
-          indices.map(({name, rules}) => (
-            <IndexTable key={name} name={name}>
-              {rules.map(({objectID, description}) => (
-                <RuleRow 
-                  key={`${name}-${objectID}`}
-                  objectID={objectID}
-                  description={description}
-                  onCopy={() => handleCopyButtonClick(name, objectID)}
-                />
+          <div className="w-full">
+            <h2 className="text-2xl font-bold">Indices</h2>
+              {indices.map(({name, rules}) => (
+                <IndexTable key={name} name={name}>
+                  {rules.map(({objectID, description}) => (
+                    <RuleRow 
+                      key={`${name}-${objectID}`}
+                      objectID={objectID}
+                      description={description}
+                      onCopy={() =>  setModalState({
+                                      status: "open",
+                                      objectID,
+                                      sourceIndex: name,
+                                      targetIndex: ((indices) => {
+                                        const firstOther = indices.find((index) => index.name !== name);
+                                        return firstOther ? firstOther.name : "";
+                                      })(indices)
+                                    })}
+                      onDelete={() => handleDeleteRule(name, objectID)}
+                    />
+                  ))}
+                </IndexTable>
               ))}
-            </IndexTable>
-          ))
-        ) : null}
+            </div>
+            ) : null}
         { modalState.status === "open" ? (
           <Modal
-            setTargetIndex={(value) => setModalState({
+            setTargetIndex={(value: string) => setModalState({
               ...modalState,
               targetIndex: value
             })}
             options={indices.map(({ name }) => name).filter((name) => name !== modalState.sourceIndex)}
+            handleCopyRule={handleCopyRule}
+            closeModal={() => setModalState({ ...modalState, status: "closed" })}
           />
         ) : null}
       </div>
@@ -96,38 +123,3 @@ export default function Home() {
   );
 }
 
-type ModalProps = {
-  setTargetIndex: (value: string) => void;
-  handleCopyRule: () => void;
-  closeModal: () => void;
-  options: string[];
-};
-
-const Modal: React.FC<ModalProps> = ({setTargetIndex, handleCopyRule, closeModal, options}) => (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-  <div className="bg-white p-4 w-96">
-    <h2 className="font-bold mb-4 text-black">Choose an index to copy the rule to</h2>
-    <div className="relative inline-block w-full text-gray-700">
-      <select 
-        className="w-full h-10 pl-3 pr-6 text-base placeholder-gray-600 border rounded-lg appearance-none focus:shadow-outline" 
-        onChange={(e) => setTargetIndex(e.target.value)}
-      >
-        {options
-          .map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-            
-          ))}
-      </select>
-      <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-        <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
-          <path d="M7 7l3-3 3 3m0 6l-3 3-3-3" stroke="#648299" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"></path>
-        </svg>
-      </div>
-    </div>
-    <button className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={handleCopyRule}>Copy</button>
-    <button className="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onClick={closeModal}>Cancel</button>
-  </div>
-</div>
-)
