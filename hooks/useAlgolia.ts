@@ -21,16 +21,14 @@ interface UseAlgoliaReturn {
 };
 
 interface Index {
-    name: string;
-    rules: Rule[];
+  name: string;
+  rules: Rule[];
 };
 
 interface Rule {
-    objectID: string;
-    description: string;
+  objectID: string;
+  description: string;
 };
-
-
 
 export function useAlgolia(): UseAlgoliaReturn {
   const [appId, setAppId] = useState(process.env.NEXT_PUBLIC_ALGOLIA_APP_ID || '');

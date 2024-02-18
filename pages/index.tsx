@@ -14,10 +14,10 @@ export default function Home() {
     status: "closed",
     sourceIndex: "",
     targetIndex: "",
-    objectID: ""
+    objectID: "",
   });
 
-  const { 
+  const {
     appId,
     apiKey,
     indices,
@@ -32,13 +32,9 @@ export default function Home() {
     const { sourceIndex, targetIndex, objectID } = modalState;
     setModalState({
       ...modalState,
-      status: "closed"
+      status: "closed",
     });
     copyRule({ sourceIndex, targetIndex, objectID });
-    }
-
-  function handleDeleteRule(name: string, objectID: string) {
-    deleteRule(name, objectID);
   }
 
   if (!session) return <NotSignedIn />;
@@ -54,7 +50,8 @@ export default function Home() {
           <button
             className="bg-red-500 font-bold rounded-full py-2 px-4 my-4"
             onClick={() => signOut()}
-          >Log out
+          >
+            Log out
           </button>
           <Link href="/lorcana">
             <button className="bg-purple-500 font-bold rounded-full py-2 px-4 my-4 mx-2">
@@ -79,47 +76,57 @@ export default function Home() {
         <button
           className="bg-green-500 font-bold rounded-full py-2 px-4 my-4"
           onClick={loadIndices}
-        >Load Indices
+        >
+          Load Indices
         </button>
         {indices.length > 0 ? (
           <div className="w-full">
             <h2 className="text-2xl font-bold">Indices</h2>
-              {indices.map(({name, rules}) => (
-                <IndexTable key={name} name={name}>
-                  {rules.map(({objectID, description}) => (
-                    <RuleRow 
-                      key={`${name}-${objectID}`}
-                      objectID={objectID}
-                      description={description}
-                      onCopy={() =>  setModalState({
-                                      status: "open",
-                                      objectID,
-                                      sourceIndex: name,
-                                      targetIndex: ((indices) => {
-                                        const firstOther = indices.find((index) => index.name !== name);
-                                        return firstOther ? firstOther.name : "";
-                                      })(indices)
-                                    })}
-                      onDelete={() => handleDeleteRule(name, objectID)}
-                    />
-                  ))}
-                </IndexTable>
-              ))}
-            </div>
-            ) : null}
-        { modalState.status === "open" ? (
+            {indices.map(({ name, rules }) => (
+              <IndexTable key={name} name={name}>
+                {rules.map(({ objectID, description }) => (
+                  <RuleRow
+                    key={`${name}-${objectID}`}
+                    objectID={objectID}
+                    description={description}
+                    onCopy={() =>
+                      setModalState({
+                        status: "open",
+                        objectID,
+                        sourceIndex: name,
+                        targetIndex: ((indices) => {
+                          const firstOther = indices.find(
+                            (index) => index.name !== name
+                          );
+                          return firstOther ? firstOther.name : "";
+                        })(indices),
+                      })
+                    }
+                    onDelete={() => deleteRule(name, objectID)}
+                  />
+                ))}
+              </IndexTable>
+            ))}
+          </div>
+        ) : null}
+        {modalState.status === "open" ? (
           <Modal
-            setTargetIndex={(value: string) => setModalState({
-              ...modalState,
-              targetIndex: value
-            })}
-            options={indices.map(({ name }) => name).filter((name) => name !== modalState.sourceIndex)}
+            setTargetIndex={(value: string) =>
+              setModalState({
+                ...modalState,
+                targetIndex: value,
+              })
+            }
+            options={indices
+              .map(({ name }) => name)
+              .filter((name) => name !== modalState.sourceIndex)}
             handleCopyRule={handleCopyRule}
-            closeModal={() => setModalState({ ...modalState, status: "closed" })}
+            closeModal={() =>
+              setModalState({ ...modalState, status: "closed" })
+            }
           />
         ) : null}
       </div>
     </main>
   );
 }
-
